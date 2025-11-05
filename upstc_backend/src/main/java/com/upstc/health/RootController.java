@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
  * RootController provides simple endpoints to verify server readiness without requiring a database.
  * - GET / returns a simple message.
  * - GET /ready returns HTTP 200 as a lightweight readiness probe.
+ * Note: Actuator health is available at /actuator/health (see application.properties).
  */
 @RestController
 public class RootController {
