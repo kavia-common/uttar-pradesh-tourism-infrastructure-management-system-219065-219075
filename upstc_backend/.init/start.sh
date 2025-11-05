@@ -34,16 +34,8 @@ if [ -n "$JAR" ] && [ -f "$JAR" ]; then
   # Replace shell with java process so PID 1 semantics are preserved in containers
   exec java -jar "$JAR"
 else
-  # Fall back to Maven run in foreground; forward SIGTERM/SIGINT to child
-  MAVN_PID=""
-  _term() {
-    if [ -n "${MAVN_PID}" ]; then
-      kill -TERM "${MAVN_PID}" 2>/dev/null || true
-    fi
-  }
-  trap _term TERM INT
-  mvn --batch-mode spring-boot:run &
-  MAVN_PID=$!
-  wait "$MAVN_PID"
-  exit $?
+  # Fall back to running via Maven in the foreground (no backgrounding, no $!).
+  # Use exec so the Maven/Spring process becomes PID 1 (important for proper signal handling)
+  # and explicitly set the server port to 3001 for preview readiness checks.
+  exec mvn --batch-mode spring-boot:run -Dspring-boot.run.arguments="--server.port=3001"
 fi
